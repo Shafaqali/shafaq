@@ -667,11 +667,11 @@ html{
             padding: 40px;
         }
 
-/*         #Contact .contact .contact-Info:hover {
+        #Contact .contact .contact-Info:hover {
             box-shadow: 0 6px 20px rgba(234, 173, 6, 0.5);
             transform: translateY(-10px);
 
-        } */
+        }
 
         .contact-Info h2 {
             color: #ff6b81;
