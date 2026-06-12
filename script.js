@@ -1,69 +1,71 @@
-document.querySelector('.menu-toggle').addEventListener('click', toggleMenu);
+const menuToggle = document.querySelector('.menu-toggle');
+const menu = document.querySelector('#menu');
 
-        function toggleMenu() {
-            document.querySelector('#menu').classList.toggle('active');
-        }
+function toggleMenu() {
+    menu?.classList.toggle('active');
+}
 
-        function closeMenu() {
-            const menu = document.querySelector('#menu');
-            if (menu.classList.contains('active')) {
-                menu.classList.remove('active');
-            }
-        }
+function closeMenu() {
+    if (menu?.classList.contains('active')) {
+        menu.classList.remove('active');
+    }
+}
 
-        document.querySelectorAll('header ul li a').forEach(link => {
-            link.addEventListener('click', closeMenu);
-        });
+menuToggle?.addEventListener('click', toggleMenu);
 
+document.querySelectorAll('header ul li a').forEach(link => {
+    link.addEventListener('click', closeMenu);
+});
 
-        function typeText() {
-    const textElement = document.getElementById("text-changing");
-    const texts = ["< Web Developer />", "< UI/UX Designer />", "< Frontend Engineer />", "< Software Engineer />"];
+function typeText() {
+    const textElement = document.getElementById('text-changing');
+
+    if (!textElement) {
+        return;
+    }
+
+    const texts = ['< Full Stack Developer />', '< UI/UX Designer />', '< Frontend Engineer />', '< Software Engineer />'];
     let textIndex = 0;
     let charIndex = 0;
     let isDeleting = false;
 
     function type() {
         const currentText = texts[textIndex];
-        let displayedText = currentText.substring(0, charIndex);
+        const displayedText = currentText.substring(0, charIndex);
 
-        textElement.textContent = displayedText + "|";
+        textElement.textContent = `${displayedText}|`;
 
         if (!isDeleting) {
             if (charIndex < currentText.length) {
                 charIndex++;
-                setTimeout(type, 100); // Typing speed
+                setTimeout(type, 100);
             } else {
                 isDeleting = true;
-                setTimeout(type, 2000); // Pause before deleting
+                setTimeout(type, 2000);
             }
+        } else if (charIndex > 0) {
+            charIndex--;
+            setTimeout(type, 50);
         } else {
-            if (charIndex > 0) {
-                charIndex--;
-                setTimeout(type, 50); // Deleting speed
-            } else {
-                isDeleting = false;
-                textIndex = (textIndex + 1) % texts.length;
-                setTimeout(type, 500); // Pause before next word
-            }
+            isDeleting = false;
+            textIndex = (textIndex + 1) % texts.length;
+            setTimeout(type, 500);
         }
     }
 
     type();
 }
 
-window.addEventListener("DOMContentLoaded", typeText);
+window.addEventListener('DOMContentLoaded', typeText);
 
 function sendEmail() {
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
-    const message = document.getElementById("message").value;
+    const name = document.getElementById('name')?.value;
+    const email = document.getElementById('email')?.value;
+    const message = document.getElementById('message')?.value;
 
     if (name && email && message) {
         alert(`Email sent successfully!\n\nName: ${name}\nEmail: ${email}\nMessage: ${message}`);
-        // Here you would typically send the email using a backend service
     } else {
-        alert("Please fill in all fields.");
+        alert('Please fill in all fields.');
     }
 }
-a
