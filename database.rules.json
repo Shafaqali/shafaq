@@ -1,0 +1,92 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid && (!newData.exists() || (!data.exists() && newData.child('plan').val() === 'free') || (data.exists() && newData.child('plan').val() === data.child('plan').val()))",
+        ".validate": "!newData.exists() || (newData.hasChildren(['displayName','email','photoURL','plan','createdAt','updatedAt']) && newData.child('displayName').isString() && newData.child('displayName').val().length <= 60 && newData.child('email').isString() && newData.child('email').val().length <= 254 && newData.child('photoURL').isString() && newData.child('photoURL').val().length <= 2048 && (newData.child('plan').val() === 'free' || newData.child('plan').val() === 'premium' || newData.child('plan').val() === 'admin') && newData.child('createdAt').isNumber() && (!data.exists() || newData.child('createdAt').val() === data.child('createdAt').val()) && newData.child('updatedAt').isNumber())"
+      }
+    },
+    "aliasClaims": {
+      "$alias": {
+        ".read": "auth != null",
+        ".write": "auth != null && ((!data.exists() && newData.exists() && newData.child('ownerId').val() === auth.uid && !root.child('reservedAliases').child($alias).exists() && !root.child('blockedAliases').child($alias).exists() && $alias !== 'www' && $alias !== 'app' && $alias !== 'api' && $alias !== 'admin' && $alias !== 'dashboard' && $alias !== 'login' && $alias !== 'logout' && $alias !== 'signup' && $alias !== 'register' && $alias !== 'account' && $alias !== 'settings' && $alias !== 'support' && $alias !== 'help' && $alias !== 'billing' && $alias !== 'premium' && $alias !== 'pricing' && $alias !== 'terms' && $alias !== 'privacy' && $alias !== 'static' && $alias !== 'assets' && $alias !== 'auth' && $alias !== 'firebase' && $alias !== 'status' && $alias !== 's' && ((newData.child('isCustom').val() === false && $alias.matches(/^[a-z0-9]{10}$/)) || (newData.child('isCustom').val() === true && $alias.matches(/^[a-z0-9]+(-[a-z0-9]+)*$/) && $alias.length >= 3 && $alias.length <= 32 && (root.child('users').child(auth.uid).child('plan').val() === 'premium' || root.child('users').child(auth.uid).child('plan').val() === 'admin')))) || (data.exists() && data.child('ownerId').val() === auth.uid && (!newData.exists() || (newData.child('ownerId').val() === auth.uid && newData.child('isCustom').val() === data.child('isCustom').val() && newData.child('createdAt').val() === data.child('createdAt').val()))))",
+        ".validate": "!newData.exists() || (newData.hasChildren(['ownerId','isCustom','createdAt']) && newData.child('ownerId').isString() && newData.child('ownerId').val().length > 0 && newData.child('isCustom').isBoolean() && newData.child('createdAt').isNumber())"
+      }
+    },
+    "publicLinks": {
+      "$alias": {
+        ".read": true,
+        ".write": "auth != null && root.child('aliasClaims').child($alias).child('ownerId').val() === auth.uid",
+        ".validate": "!newData.exists() || (newData.hasChildren(['originalUrl','alias','isCustom','isActive','createdAt','updatedAt','totalClicks']) && newData.child('originalUrl').isString() && newData.child('originalUrl').val().length > 7 && newData.child('originalUrl').val().length <= 2048 && newData.child('alias').val() === $alias && newData.child('isCustom').isBoolean() && newData.child('isActive').isBoolean() && newData.child('createdAt').isNumber() && newData.child('updatedAt').isNumber() && newData.child('totalClicks').isNumber() && newData.child('totalClicks').val() >= 0 && (!newData.child('lastClickedAt').exists() || newData.child('lastClickedAt').isNumber()) && (!newData.child('expiresAt').exists() || newData.child('expiresAt').isNumber()))",
+        "totalClicks": {
+          ".write": "data.isNumber() && newData.isNumber() && newData.val() === data.val() + 1",
+          ".validate": "newData.isNumber() && newData.val() >= 0 && ((!data.exists() && newData.val() === 0) || (data.exists() && (newData.val() === data.val() || newData.val() === data.val() + 1)))"
+        },
+        "lastClickedAt": {
+          ".write": "newData.isNumber() && newData.val() <= now && newData.val() >= now - 60000",
+          ".validate": "newData.isNumber() && (!data.exists() || newData.val() === data.val() || (newData.val() >= data.val() && newData.val() <= now && newData.val() >= now - 60000))"
+        }
+      },
+      ".indexOn": ["createdAt", "totalClicks", "isActive"]
+    },
+    "userLinks": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        "$alias": {
+          ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('aliasClaims').child($alias).child('ownerId').val() === auth.uid)",
+          ".validate": "!newData.exists() || (newData.hasChildren(['originalUrl','alias','isCustom','isActive','createdAt','updatedAt','totalClicks']) && newData.child('originalUrl').isString() && newData.child('originalUrl').val().length > 7 && newData.child('originalUrl').val().length <= 2048 && newData.child('alias').val() === $alias && newData.child('isCustom').isBoolean() && newData.child('isActive').isBoolean() && newData.child('createdAt').isNumber() && newData.child('updatedAt').isNumber() && newData.child('totalClicks').isNumber() && newData.child('totalClicks').val() >= 0 && (!newData.child('lastClickedAt').exists() || newData.child('lastClickedAt').isNumber()) && (!newData.child('expiresAt').exists() || newData.child('expiresAt').isNumber()))"
+        },
+        ".indexOn": ["createdAt", "totalClicks", "isActive", "isCustom"]
+      }
+    },
+    "dailyAnalytics": {
+      "$alias": {
+        ".read": "auth != null && root.child('aliasClaims').child($alias).child('ownerId').val() === auth.uid",
+        ".write": "auth != null && root.child('aliasClaims').child($alias).child('ownerId').val() === auth.uid",
+        "$date": {
+          ".validate": "$date.matches(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)",
+          "clicks": {
+            ".write": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)",
+            ".validate": "newData.isNumber() && newData.val() > 0"
+          },
+          "$other": { ".validate": false }
+        }
+      }
+    },
+    "clickEvents": {
+      "$alias": {
+        ".read": "auth != null && root.child('aliasClaims').child($alias).child('ownerId').val() === auth.uid",
+        ".write": "auth != null && root.child('aliasClaims').child($alias).child('ownerId').val() === auth.uid",
+        "$eventId": {
+          ".write": "!data.exists() && newData.exists()",
+          ".validate": "newData.hasChildren(['timestamp','referrerHost','deviceCategory','browserCategory','countryCode']) && newData.child('timestamp').isNumber() && newData.child('timestamp').val() <= now && newData.child('timestamp').val() >= now - 60000 && newData.child('referrerHost').isString() && newData.child('referrerHost').val().length <= 120 && newData.child('deviceCategory').isString() && (newData.child('deviceCategory').val() === 'Desktop' || newData.child('deviceCategory').val() === 'Tablet' || newData.child('deviceCategory').val() === 'Mobile' || newData.child('deviceCategory').val() === 'Unknown') && newData.child('browserCategory').isString() && newData.child('browserCategory').val().length <= 30 && newData.child('countryCode').isString() && newData.child('countryCode').val().length <= 2"
+        }
+      }
+    },
+    "reservedAliases": {
+      ".read": "auth != null",
+      "$alias": {
+        ".write": "auth != null && root.child('users').child(auth.uid).child('plan').val() === 'admin'",
+        ".validate": "newData.val() === true"
+      }
+    },
+    "blockedAliases": {
+      ".read": "auth != null",
+      "$alias": {
+        ".write": "auth != null && root.child('users').child(auth.uid).child('plan').val() === 'admin'",
+        ".validate": "newData.val() === true"
+      }
+    },
+    "blockedDomains": {
+      ".read": "auth != null",
+      "$domainKey": {
+        ".write": "auth != null && root.child('users').child(auth.uid).child('plan').val() === 'admin'",
+        ".validate": "newData.val() === true"
+      }
+    },
+    "$other": { ".read": false, ".write": false }
+  }
+}
